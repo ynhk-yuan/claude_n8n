@@ -1,0 +1,669 @@
+{
+  "active": false,
+  "connections": {
+    "기존 백업 목록": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "워크플로우 목록 조회",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "기준 커밋 조회": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "기존 백업 목록",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "매일 저녁 6시": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "백업 설정",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "백업 설정": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "브랜치 조회",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "변경 여부 확인": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "커밋 생성",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "변경 없음",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "브랜치 재조회": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "기준 커밋 조회",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "브랜치 조회": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "저장소 비어있음?",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "수동 실행 트리거": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "백업 설정",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "워크플로우 목록 조회": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "커밋 파일 구성",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "저장소 비어있음?": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "초기 README 커밋",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "기준 커밋 조회",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "초기 README 커밋": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "브랜치 재조회",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "커밋 생성": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "브랜치 갱신",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "커밋 파일 구성": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "트리 생성",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "트리 생성": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "변경 여부 확인",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "id": "obmeTzl2IgeYy7nt",
+  "isArchived": false,
+  "name": "[CRON] 매일 저녁 6시 n8n 워크플로우 GitHub 백업",
+  "nodes": [
+    {
+      "id": "g1",
+      "name": "매일 저녁 6시",
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "position": [
+        256,
+        208
+      ],
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2
+    },
+    {
+      "id": "g2",
+      "name": "수동 실행 트리거",
+      "parameters": {},
+      "position": [
+        256,
+        400
+      ],
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1
+    },
+    {
+      "id": "g3",
+      "name": "백업 설정",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "owner",
+              "type": "string",
+              "value": "ynhk-yuan"
+            },
+            {
+              "id": "s2",
+              "name": "repo",
+              "type": "string",
+              "value": "claude_n8n"
+            },
+            {
+              "id": "s3",
+              "name": "branch",
+              "type": "string",
+              "value": "main"
+            },
+            {
+              "id": "s4",
+              "name": "folder",
+              "type": "string",
+              "value": "workflows"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        512,
+        304
+      ],
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "alwaysOutputData": true,
+      "continueOnFail": true,
+      "credentials": {
+        "githubApi": {
+          "id": "FezohM9DZB7v0ny6",
+          "name": "GitHub account"
+        }
+      },
+      "id": "g4",
+      "name": "브랜치 조회",
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "nodeCredentialType": "githubApi",
+        "options": {},
+        "sendHeaders": true,
+        "url": "=https://api.github.com/repos/{{ $json.owner }}/{{ $json.repo }}/git/ref/heads/{{ $json.branch }}"
+      },
+      "position": [
+        752,
+        304
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "credentials": {
+        "githubApi": {
+          "id": "FezohM9DZB7v0ny6",
+          "name": "GitHub account"
+        }
+      },
+      "id": "g5",
+      "name": "기준 커밋 조회",
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "nodeCredentialType": "githubApi",
+        "options": {},
+        "sendHeaders": true,
+        "url": "=https://api.github.com/repos/{{ $('백업 설정').first().json.owner }}/{{ $('백업 설정').first().json.repo }}/git/commits/{{ $json.object.sha }}"
+      },
+      "position": [
+        1504,
+        304
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "alwaysOutputData": true,
+      "continueOnFail": true,
+      "credentials": {
+        "githubApi": {
+          "id": "FezohM9DZB7v0ny6",
+          "name": "GitHub account"
+        }
+      },
+      "id": "g6",
+      "name": "기존 백업 목록",
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "nodeCredentialType": "githubApi",
+        "options": {},
+        "sendHeaders": true,
+        "url": "=https://api.github.com/repos/{{ $('백업 설정').first().json.owner }}/{{ $('백업 설정').first().json.repo }}/contents/{{ $('백업 설정').first().json.folder }}?ref={{ $('백업 설정').first().json.branch }}"
+      },
+      "position": [
+        1760,
+        304
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "credentials": {
+        "n8nApi": {
+          "id": "Jybw1P1Wa39H0MCr",
+          "name": "n8n account"
+        }
+      },
+      "executeOnce": true,
+      "id": "g7",
+      "name": "워크플로우 목록 조회",
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "position": [
+        2000,
+        304
+      ],
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1
+    },
+    {
+      "id": "g8",
+      "name": "커밋 파일 구성",
+      "parameters": {
+        "jsCode": "const cfg = $('백업 설정').first().json;\nconst baseCommit = $('기준 커밋 조회').first().json;\nconst wfs = $('워크플로우 목록 조회').all().map((i) => i.json).filter((w) => w && w.id);\nif (wfs.length === 0) { throw new Error('워크플로우 목록이 비어 있습니다. n8n API 크리덴셜을 확인하세요.'); }\nconst slug = (s) => String(s || 'untitled').replace(/[^0-9A-Za-z가-힣_-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 80) || 'untitled';\nconst sortKeys = (v) => Array.isArray(v) ? v.map(sortKeys) : (v && typeof v === 'object' ? Object.keys(v).sort().reduce((o, k) => { o[k] = sortKeys(v[k]); return o; }, {}) : v);\nconst entries = wfs.map((w) => {\n  const clean = sortKeys({ id: w.id, name: w.name, active: w.active, isArchived: w.isArchived, nodes: w.nodes, connections: w.connections, settings: w.settings, pinData: w.pinData, tags: (w.tags || []).map((t) => t.name || t), versionId: w.versionId, updatedAt: w.updatedAt });\n  return { path: cfg.folder + '/' + slug(w.name) + '__' + w.id + '.json', mode: '100644', type: 'blob', content: JSON.stringify(clean, null, 2) + String.fromCharCode(10) };\n});\nconst keep = new Set(entries.map((e) => e.path));\nconst existing = $('기존 백업 목록').all().map((i) => i.json).filter((f) => f && f.type === 'file' && typeof f.path === 'string' && f.path.endsWith('.json'));\nconst removed = existing.filter((f) => !keep.has(f.path)).map((f) => ({ path: f.path, mode: '100644', type: 'blob', sha: null }));\nconst ts = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date());\nreturn [{ json: { owner: cfg.owner, repo: cfg.repo, branch: cfg.branch, parentSha: baseCommit.sha, baseTreeSha: baseCommit.tree.sha, workflowCount: entries.length, removedCount: removed.length, message: 'n8n 워크플로우 백업 ' + ts + ' KST (' + entries.length + '개' + (removed.length ? ', 삭제 ' + removed.length + '개' : '') + ')', tree: entries.concat(removed) } }];"
+      },
+      "position": [
+        2256,
+        304
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "credentials": {
+        "githubApi": {
+          "id": "FezohM9DZB7v0ny6",
+          "name": "GitHub account"
+        }
+      },
+      "id": "g9",
+      "name": "트리 생성",
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "jsonBody": "={{ JSON.stringify({ base_tree: $json.baseTreeSha, tree: $json.tree }) }}",
+        "method": "POST",
+        "nodeCredentialType": "githubApi",
+        "options": {},
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "url": "=https://api.github.com/repos/{{ $json.owner }}/{{ $json.repo }}/git/trees"
+      },
+      "position": [
+        2512,
+        304
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "id": "g10",
+      "name": "변경 여부 확인",
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.sha }}",
+              "operator": {
+                "operation": "notEquals",
+                "type": "string"
+              },
+              "rightValue": "={{ $('커밋 파일 구성').first().json.baseTreeSha }}"
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          }
+        },
+        "options": {}
+      },
+      "position": [
+        2752,
+        304
+      ],
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2
+    },
+    {
+      "credentials": {
+        "githubApi": {
+          "id": "FezohM9DZB7v0ny6",
+          "name": "GitHub account"
+        }
+      },
+      "id": "g11",
+      "name": "커밋 생성",
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "jsonBody": "={{ JSON.stringify({ message: $('커밋 파일 구성').first().json.message, tree: $json.sha, parents: [$('커밋 파일 구성').first().json.parentSha] }) }}",
+        "method": "POST",
+        "nodeCredentialType": "githubApi",
+        "options": {},
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "url": "=https://api.github.com/repos/{{ $('커밋 파일 구성').first().json.owner }}/{{ $('커밋 파일 구성').first().json.repo }}/git/commits"
+      },
+      "position": [
+        3008,
+        208
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "credentials": {
+        "githubApi": {
+          "id": "FezohM9DZB7v0ny6",
+          "name": "GitHub account"
+        }
+      },
+      "id": "g12",
+      "name": "브랜치 갱신",
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "jsonBody": "={{ JSON.stringify({ sha: $json.sha, force: false }) }}",
+        "method": "PATCH",
+        "nodeCredentialType": "githubApi",
+        "options": {},
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "url": "=https://api.github.com/repos/{{ $('커밋 파일 구성').first().json.owner }}/{{ $('커밋 파일 구성').first().json.repo }}/git/refs/heads/{{ $('커밋 파일 구성').first().json.branch }}"
+      },
+      "position": [
+        3264,
+        208
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "id": "g13",
+      "name": "변경 없음",
+      "parameters": {},
+      "position": [
+        3008,
+        400
+      ],
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1
+    },
+    {
+      "id": "g14",
+      "name": "저장소 비어있음?",
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "e1",
+              "leftValue": "={{ $json.object && $json.object.sha ? 'ok' : 'empty' }}",
+              "operator": {
+                "operation": "equals",
+                "type": "string"
+              },
+              "rightValue": "empty"
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          }
+        },
+        "options": {}
+      },
+      "position": [
+        912,
+        304
+      ],
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2
+    },
+    {
+      "credentials": {
+        "githubApi": {
+          "id": "FezohM9DZB7v0ny6",
+          "name": "GitHub account"
+        }
+      },
+      "id": "g15",
+      "name": "초기 README 커밋",
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "jsonBody": "={{ JSON.stringify({ message: '초기화: n8n 워크플로우 백업 저장소', content: 'IyBjbGF1ZGVfbjhuCgpuOG4g7JuM7YGs7ZSM66Gc7JqwIOyekOuPmSDrsLHsl4Ug7KCA7J6l7IaMICjrp6TsnbwgMTg6MDAgS1NULCB3b3JrZmxvd3MvIO2PtOuNlCkK', branch: $('백업 설정').first().json.branch }) }}",
+        "method": "PUT",
+        "nodeCredentialType": "githubApi",
+        "options": {},
+        "sendBody": true,
+        "sendHeaders": true,
+        "specifyBody": "json",
+        "url": "=https://api.github.com/repos/{{ $('백업 설정').first().json.owner }}/{{ $('백업 설정').first().json.repo }}/contents/README.md"
+      },
+      "position": [
+        1104,
+        480
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "credentials": {
+        "githubApi": {
+          "id": "FezohM9DZB7v0ny6",
+          "name": "GitHub account"
+        }
+      },
+      "id": "g16",
+      "name": "브랜치 재조회",
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "nodeCredentialType": "githubApi",
+        "options": {},
+        "sendHeaders": true,
+        "url": "=https://api.github.com/repos/{{ $('백업 설정').first().json.owner }}/{{ $('백업 설정').first().json.repo }}/git/ref/heads/{{ $('백업 설정').first().json.branch }}"
+      },
+      "position": [
+        1312,
+        480
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "binaryMode": "separate",
+    "executionOrder": "v1",
+    "timezone": "Asia/Seoul"
+  },
+  "tags": [],
+  "updatedAt": "2026-11-09T12:28:10.383Z",
+  "versionId": "ab050b22-79d3-41f0-84ae-aa2376e42e5f"
+}

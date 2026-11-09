@@ -1,0 +1,176 @@
+{
+  "active": true,
+  "connections": {
+    "수동 실행 트리거": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "할 일 입력",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "카카오 할 일 생성": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "응답",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "할 일 웹훅": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "할 일 입력",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "할 일 입력": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "카카오 할 일 생성",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "id": "5ICTZLFWrzXAnevZ",
+  "isArchived": false,
+  "name": "[WEBHOOK] 카카오 톡캘린더 할 일 등록",
+  "nodes": [
+    {
+      "id": "w1",
+      "name": "할 일 웹훅",
+      "notes": "body: {\"content\":\"할 일\",\"due_date\":\"20261111\"} (생략 시 기본값)",
+      "parameters": {
+        "httpMethod": "POST",
+        "options": {},
+        "path": "kakao-task",
+        "responseMode": "responseNode"
+      },
+      "position": [
+        250,
+        200
+      ],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "webhookId": "kakao-task-create"
+    },
+    {
+      "id": "w2",
+      "name": "수동 실행 트리거",
+      "parameters": {},
+      "position": [
+        250,
+        400
+      ],
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1
+    },
+    {
+      "id": "w3",
+      "name": "할 일 입력",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "content",
+              "type": "string",
+              "value": "={{ ($json.body && $json.body.content) || '빼빼로 선물 (11/11 빼빼로데이)' }}"
+            },
+            {
+              "id": "a2",
+              "name": "due_date",
+              "type": "string",
+              "value": "={{ ($json.body && $json.body.due_date) || '20261111' }}"
+            },
+            {
+              "id": "a3",
+              "name": "alarm_time",
+              "type": "string",
+              "value": "={{ ($json.body && $json.body.alarm_time) || '0900' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        550,
+        300
+      ],
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "continueOnFail": true,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "55Tf7bekqIJ6QqOr",
+          "name": "Unnamed credential"
+        }
+      },
+      "id": "w4",
+      "name": "카카오 할 일 생성",
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "task",
+              "value": "={{ JSON.stringify({ content: $json.content, due_info: { due_date: $json.due_date, time_zone: 'Asia/Seoul', alarm_time: $json.alarm_time } }) }}"
+            }
+          ]
+        },
+        "contentType": "form-urlencoded",
+        "method": "POST",
+        "nodeCredentialType": "oAuth2Api",
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "keypair",
+        "url": "https://kapi.kakao.com/v1/api/calendar/create/task"
+      },
+      "position": [
+        850,
+        300
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "id": "w5",
+      "name": "응답",
+      "parameters": {
+        "options": {},
+        "respondWith": "json",
+        "responseBody": "={{ { ok: !$json.error, request: $('할 일 입력').first().json, result: $json } }}"
+      },
+      "position": [
+        1150,
+        300
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1
+    }
+  ],
+  "pinData": null,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Seoul"
+  },
+  "tags": [],
+  "updatedAt": "2026-11-09T11:19:32.476Z",
+  "versionId": "cd429d8f-8194-4ad7-b7df-9069c11fc7fa"
+}

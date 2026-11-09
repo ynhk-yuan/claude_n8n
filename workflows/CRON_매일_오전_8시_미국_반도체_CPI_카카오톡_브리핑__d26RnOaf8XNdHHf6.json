@@ -1,0 +1,352 @@
+{
+  "active": true,
+  "connections": {
+    "BLS CPI 조회": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "반도체 뉴스 RSS",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "SOX 지수 조회": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "SOXX ETF 조회",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "SOXX ETF 조회": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "BLS CPI 조회",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "매일 오전 8시": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "SOX 지수 조회",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "메시지 구성": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "카카오톡 나에게 보내기",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "반도체 뉴스 RSS": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "메시지 구성",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "수동 실행 트리거": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "SOX 지수 조회",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "카카오톡 나에게 보내기": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "상태 저장",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "id": "d26RnOaf8XNdHHf6",
+  "isArchived": false,
+  "name": "[CRON] 매일 오전 8시 미국 반도체·CPI 카카오톡 브리핑",
+  "nodes": [
+    {
+      "id": "t1",
+      "name": "매일 오전 8시",
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 1,
+              "field": "days",
+              "triggerAtHour": 8,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "position": [
+        250,
+        200
+      ],
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2
+    },
+    {
+      "id": "t2",
+      "name": "수동 실행 트리거",
+      "parameters": {},
+      "position": [
+        250,
+        360
+      ],
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1
+    },
+    {
+      "continueOnFail": true,
+      "id": "h1",
+      "maxTries": 2,
+      "name": "SOX 지수 조회",
+      "parameters": {
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "n8n-daily-brief/1.0"
+            }
+          ]
+        },
+        "options": {},
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "range",
+              "value": "10d"
+            },
+            {
+              "name": "interval",
+              "value": "1d"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "sendQuery": true,
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5ESOX"
+      },
+      "position": [
+        550,
+        360
+      ],
+      "retryOnFail": true,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "continueOnFail": true,
+      "id": "h2",
+      "maxTries": 2,
+      "name": "SOXX ETF 조회",
+      "parameters": {
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "n8n-daily-brief/1.0"
+            }
+          ]
+        },
+        "options": {},
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "range",
+              "value": "10d"
+            },
+            {
+              "name": "interval",
+              "value": "1d"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "sendQuery": true,
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/SOXX"
+      },
+      "position": [
+        800,
+        360
+      ],
+      "retryOnFail": true,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "continueOnFail": true,
+      "id": "h3",
+      "maxTries": 2,
+      "name": "BLS CPI 조회",
+      "parameters": {
+        "contentType": "json",
+        "jsonBody": "={{ JSON.stringify({ seriesid: ['CUSR0000SA0','CUUR0000SA0','CUSR0000SA0L1E','CUUR0000SA0L1E'], startyear: String(new Date().getFullYear() - 2), endyear: String(new Date().getFullYear()) }) }}",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "specifyBody": "json",
+        "url": "https://api.bls.gov/publicAPI/v1/timeseries/data/"
+      },
+      "position": [
+        1050,
+        360
+      ],
+      "retryOnFail": true,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "continueOnFail": true,
+      "id": "h4",
+      "maxTries": 2,
+      "name": "반도체 뉴스 RSS",
+      "parameters": {
+        "options": {
+          "response": {
+            "response": {
+              "outputPropertyName": "data",
+              "responseFormat": "text"
+            }
+          }
+        },
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "(Nvidia OR AMD OR Broadcom OR Micron OR Intel) (semiconductor OR chip OR chips) when:1d"
+            },
+            {
+              "name": "hl",
+              "value": "en-US"
+            },
+            {
+              "name": "gl",
+              "value": "US"
+            },
+            {
+              "name": "ceid",
+              "value": "US:en"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "url": "https://news.google.com/rss/search"
+      },
+      "position": [
+        1300,
+        360
+      ],
+      "retryOnFail": true,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "id": "c1",
+      "name": "메시지 구성",
+      "parameters": {
+        "jsCode": "const NL = String.fromCharCode(10);\nconst DQ = String.fromCharCode(34);\nconst FAIL = '조회 실패';\nconst sd = $getWorkflowStaticData('global');\nlet isSchedule = false;\ntry { isSchedule = $('매일 오전 8시').isExecuted && $execution.mode === 'production'; } catch (e) {}\nconst kst = (d, o) => new Intl.DateTimeFormat('sv-SE', Object.assign({ timeZone: 'Asia/Seoul' }, o || {})).format(d);\nconst now = new Date();\nconst today = kst(now);\nconst wk = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', weekday: 'short' }).format(now);\nif (isSchedule && sd.lastSentDate === today) { return []; }\nconst get = (name) => { try { const a = $(name).all(); return a.length ? a[0].json : null; } catch (e) { return null; } };\nconst cut = (s, n) => (s.length > n ? s.slice(0, n - 1) + '…' : s);\nconst num = (n, d) => Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });\nconst sgn = (n, d) => (n >= 0 ? '+' : '') + n.toFixed(d) + '%';\nconst msgs = [];\nconst push = (text, url, btn) => msgs.push({ template_object: JSON.stringify({ object_type: 'text', text: cut(text, 200), link: { web_url: url, mobile_web_url: url }, button_title: btn || '열기' }) });\n\n// 1) 반도체 시세\nconst chart = (j) => { try { const r = j.chart.result[0]; const ts = r.timestamp; const cl = r.indicators.quote[0].close; const p = []; for (let i = 0; i < ts.length; i++) { if (cl[i] != null) p.push({ t: ts[i], c: cl[i] }); } if (p.length < 2) return null; const a = p[p.length - 2]; const b = p[p.length - 1]; return { close: b.c, chg: (b.c / a.c - 1) * 100, date: new Intl.DateTimeFormat('sv-SE', { timeZone: r.meta.exchangeTimezoneName || 'America/New_York' }).format(new Date(b.t * 1000)) }; } catch (e) { return null; } };\nconst sox = chart(get('SOX 지수 조회') || {});\nconst etf = chart(get('SOXX ETF 조회') || {});\nconst l1 = sox ? 'SOX 지수(' + sox.date + ' 종가) ' + num(sox.close, 2) + ' (' + sgn(sox.chg, 2) + ')' : 'SOX 지수: ' + FAIL;\nconst l2 = etf ? 'SOXX ETF[지수 아님](' + etf.date + ') $' + num(etf.close, 2) + ' (' + sgn(etf.chg, 2) + ')' : 'SOXX ETF: ' + FAIL;\npush('☀️ ' + today + '(' + wk + ') 미국 반도체·CPI 브리핑' + NL + l1 + NL + l2 + NL + '출처: Yahoo Finance(비공식·지연 가능)', 'https://finance.yahoo.com/quote/%5ESOX', '시세 보기');\n\n// 2) CPI (BLS 공식)\nconst SCHEDULE = { '2026-10': '2026-11-10', '2026-11': '2026-12-10', '2027-01': '2027-02-11', '2027-02': '2027-03-10', '2027-03': '2027-04-13', '2027-04': '2027-05-12', '2027-05': '2027-06-10', '2027-06': '2027-07-14', '2027-07': '2027-08-11', '2027-08': '2027-09-14', '2027-09': '2027-10-14', '2027-10': '2027-11-10', '2027-11': '2027-12-10' };\nlet cpiPeriod = null;\ntry {\n  const j = get('BLS CPI 조회');\n  const S = j.Results.series;\n  const ser = (id) => { const m = {}; for (const d of S.find((x) => x.seriesID === id).data) { const v = parseFloat(d.value); if (/^M(0[1-9]|1[0-2])$/.test(d.period) && !isNaN(v)) { m[d.year + '-' + d.period.slice(1)] = v; } } return m; };\n  const hSA = ser('CUSR0000SA0'); const hNSA = ser('CUUR0000SA0'); const cSA = ser('CUSR0000SA0L1E'); const cNSA = ser('CUUR0000SA0L1E');\n  const keys = Object.keys(hSA).sort();\n  const cur = keys[keys.length - 1];\n  const shift = (k, n) => { const m = Number(k.slice(5, 7)) - 1 + n; const y = Number(k.slice(0, 4)) + Math.floor(m / 12); return y + '-' + String(((m % 12) + 12) % 12 + 1).padStart(2, '0'); };\n  const yoy = (nsa) => { const b = nsa[shift(cur, -12)]; return nsa[cur] != null && b != null ? ((nsa[cur] / b - 1) * 100).toFixed(1) + '%' : FAIL; };\n  const mom = (sa) => { const b = sa[shift(cur, -1)]; return sa[cur] != null && b != null ? sgn((sa[cur] / b - 1) * 100, 1) : FAIL; };\n  const stored = sd.lastCpiPeriod;\n  const tag = !stored ? '기존 수치(최초 조회)' : (stored !== cur ? '🆕 신규 발표' : '기존 수치');\n  const nxt = shift(cur, 1);\n  const rel = SCHEDULE[nxt];\n  const nextLine = '다음 발표: ' + (rel ? rel + '(' + nxt + '월분)' + (rel < today ? ' ※일정 확인 필요' : '') : nxt + '월분 일정 미등록');\n  cpiPeriod = cur;\n  push('🇺🇸 미국 CPI ' + cur + '월분 ' + tag + NL + '헤드라인 전년비 ' + yoy(hNSA) + ' / 전월비 ' + mom(hSA) + NL + '근원 전년비 ' + yoy(cNSA) + ' / 전월비 ' + mom(cSA) + NL + nextLine + NL + '출처: BLS(공식)', 'https://www.bls.gov/cpi/', 'BLS CPI');\n} catch (e) {\n  push('🇺🇸 미국 CPI: ' + FAIL + ' (BLS API)', 'https://www.bls.gov/cpi/', 'BLS CPI');\n}\n\n// 3) 뉴스 (Google News RSS, 최근 24시간, 최대 3건)\nconst out = [];\ntry {\n  const n = get('반도체 뉴스 RSS');\n  const xml = n && n.data;\n  if (!xml || xml.indexOf('<rss') < 0) { throw new Error('rss'); }\n  const dec = (s) => s.split('<![CDATA[').join('').split(']]>').join('').split('&lt;').join('<').split('&gt;').join('>').split('&quot;').join(DQ).split('&#39;').join(String.fromCharCode(39)).split('&amp;').join('&');\n  const tag = (b, t) => { const m = new RegExp('<' + t + '[^>]*>([^]*?)</' + t + '>').exec(b); return m ? dec(m[1].trim()) : ''; };\n  const re = new RegExp('<item>([^]*?)</item>', 'g');\n  const items = []; let m;\n  while ((m = re.exec(xml)) !== null) { const b = m[1]; let title = tag(b, 'title'); const source = tag(b, 'source'); if (source && title.endsWith(' - ' + source)) { title = title.slice(0, title.length - source.length - 3); } items.push({ title, link: tag(b, 'link'), source, pub: new Date(tag(b, 'pubDate')) }); }\n  const sent = sd.sentNews || [];\n  const seen = new Set();\n  const co = ['Nvidia', 'AMD', 'Broadcom', 'Micron', 'Intel'];\n  const fresh = items.filter((x) => x.link && !isNaN(x.pub) && now - x.pub <= 86400000 && !sent.includes(x.link)).filter((x) => { const k = x.title.toLowerCase().slice(0, 60); if (seen.has(k)) { return false; } seen.add(k); return true; });\n  fresh.forEach((x) => { const t = x.title.toLowerCase(); x.co = co.find((c) => new RegExp('(^|[^a-z])' + c.toLowerCase() + '([^a-z]|$)').test(t)) || ''; x.score = x.co ? 1 : 0; });\n  fresh.sort((a, b) => b.score - a.score || b.pub - a.pub);\n  for (const x of fresh) { if (x.co && out.length < 3 && !out.some((o) => o.co === x.co)) { out.push(x); } }\n  for (const x of fresh) { if (out.length < 3 && !out.includes(x)) { out.push(x); } }\n  if (out.length === 0) { push('📰 최근 24시간 신규 반도체 뉴스 없음(Google News RSS)', 'https://news.google.com/', 'Google News'); }\n  out.forEach((x, i) => push('📰 [' + (i + 1) + '/' + out.length + '] ' + cut(x.title, 110) + NL + x.source + ' · ' + kst(x.pub, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).slice(5) + ' KST', x.link, '원문 보기'));\n} catch (e) {\n  push('📰 반도체 뉴스: ' + FAIL + ' (Google News RSS)', 'https://news.google.com/', 'Google News');\n}\n\nreturn msgs.map((m, i) => ({ json: Object.assign({}, m, i === 0 ? { _commit: { today, cpiPeriod, newsLinks: out.map((x) => x.link) } } : {}) }));"
+      },
+      "position": [
+        1550,
+        360
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "continueOnFail": true,
+      "credentials": {
+        "oAuth2Api": {
+          "id": "55Tf7bekqIJ6QqOr",
+          "name": "Unnamed credential"
+        }
+      },
+      "id": "k1",
+      "name": "카카오톡 나에게 보내기",
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "template_object",
+              "value": "={{ $json.template_object }}"
+            }
+          ]
+        },
+        "contentType": "form-urlencoded",
+        "method": "POST",
+        "nodeCredentialType": "oAuth2Api",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchInterval": 800,
+              "batchSize": 1
+            }
+          }
+        },
+        "sendBody": true,
+        "specifyBody": "keypair",
+        "url": "https://kapi.kakao.com/v2/api/talk/memo/default/send"
+      },
+      "position": [
+        1800,
+        360
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "id": "c2",
+      "name": "상태 저장",
+      "parameters": {
+        "jsCode": "const sends = $input.all();\nconst ok = sends.length > 0 && sends.every((i) => i.json && i.json.result_code === 0);\nlet isSchedule = false;\ntry { isSchedule = $('매일 오전 8시').isExecuted && $execution.mode === 'production'; } catch (e) {}\nconst plan = $('메시지 구성').first().json._commit;\nconst sd = $getWorkflowStaticData('global');\nlet saved = false;\nif (isSchedule && ok && plan) {\n  sd.lastSentDate = plan.today;\n  if (plan.cpiPeriod) { sd.lastCpiPeriod = plan.cpiPeriod; }\n  sd.sentNews = (sd.sentNews || []).concat(plan.newsLinks).slice(-100);\n  saved = true;\n}\nreturn [{ json: { allSent: ok, sentCount: sends.length, failed: sends.filter((i) => !(i.json && i.json.result_code === 0)).length, stateSaved: saved } }];"
+      },
+      "position": [
+        2050,
+        360
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    }
+  ],
+  "pinData": null,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Seoul"
+  },
+  "tags": [],
+  "updatedAt": "2026-11-09T11:10:55.717Z",
+  "versionId": "a31b6dcf-b7d9-48f0-9bd8-c4d2b90fbcab"
+}

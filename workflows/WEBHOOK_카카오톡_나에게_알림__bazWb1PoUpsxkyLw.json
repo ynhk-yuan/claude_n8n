@@ -1,0 +1,127 @@
+{
+  "active": true,
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "카카오톡 나에게 보내기",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "수동 실행 트리거": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "카카오톡 나에게 보내기",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "카카오톡 나에게 보내기": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "응답",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "id": "bazWb1PoUpsxkyLw",
+  "isArchived": false,
+  "name": "[WEBHOOK] 카카오톡 나에게 알림",
+  "nodes": [
+    {
+      "credentials": {
+        "oAuth2Api": {
+          "id": "55Tf7bekqIJ6QqOr",
+          "name": "Unnamed credential"
+        }
+      },
+      "id": "n5",
+      "name": "카카오톡 나에게 보내기",
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "template_object",
+              "value": "={{ JSON.stringify({ object_type: 'text', text: 'Hello, World', link: { web_url: 'https://n8n.io', mobile_web_url: 'https://n8n.io' } }) }}"
+            }
+          ]
+        },
+        "contentType": "form-urlencoded",
+        "genericAuthType": "oAuth2Api",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "url": "https://kapi.kakao.com/v2/api/talk/memo/default/send"
+      },
+      "position": [
+        560,
+        304
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "id": "n6",
+      "name": "응답",
+      "parameters": {
+        "options": {},
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": $json.result_code === 0, \"result\": $json } }}"
+      },
+      "position": [
+        864,
+        304
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1
+    },
+    {
+      "id": "n1",
+      "name": "Webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "options": {},
+        "path": "kakao-notify",
+        "responseMode": "responseNode"
+      },
+      "position": [
+        256,
+        304
+      ],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "webhookId": "b84e295c-3262-4799-99b3-eabe35ae3562"
+    },
+    {
+      "id": "n0",
+      "name": "수동 실행 트리거",
+      "parameters": {},
+      "position": [
+        250,
+        500
+      ],
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "binaryMode": "separate",
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "updatedAt": "2026-11-09T10:55:52.564Z",
+  "versionId": "d5e554fc-e9be-426f-941f-78a70ae4e739"
+}

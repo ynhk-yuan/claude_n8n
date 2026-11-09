@@ -1,0 +1,357 @@
+{
+  "active": false,
+  "connections": {
+    "OpenAI 레시피 블로그 작성": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "음식 이미지 검색",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "OpenAI 요리 선정": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "선정 결과 정리",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "블로그 양식 정리": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "이미지 다운로드",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "선정 결과 정리": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "OpenAI 레시피 블로그 작성",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "수동 실행": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "인기 한식 조회",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "음식 이미지 검색": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "블로그 양식 정리",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "이미지 다운로드": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "SMTP 메일 발송",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "인기 한식 조회": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "OpenAI 요리 선정",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "id": "FHlFqczdyp5AvagZ",
+  "isArchived": false,
+  "name": "[MANUAL] 인기 한식 레시피 블로그 메일 발송",
+  "nodes": [
+    {
+      "disabled": true,
+      "id": "n1",
+      "name": "수동 실행",
+      "parameters": {},
+      "position": [
+        256,
+        304
+      ],
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1
+    },
+    {
+      "id": "n2",
+      "name": "인기 한식 조회",
+      "parameters": {
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        },
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "인기 한식 레시피 when:7d"
+            },
+            {
+              "name": "hl",
+              "value": "ko"
+            },
+            {
+              "name": "gl",
+              "value": "KR"
+            },
+            {
+              "name": "ceid",
+              "value": "KR:ko"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "url": "https://news.google.com/rss/search"
+      },
+      "position": [
+        560,
+        304
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "credentials": {
+        "openAiApi": {
+          "id": "05vtmsQFSnrSJDbA",
+          "name": "OpenAI account"
+        }
+      },
+      "id": "n3",
+      "name": "OpenAI 요리 선정",
+      "parameters": {
+        "jsonOutput": true,
+        "messages": {
+          "values": [
+            {
+              "content": "당신은 한식 트렌드 분석가입니다. 반드시 JSON으로만 답하세요.",
+              "role": "system"
+            },
+            {
+              "content": "=아래는 최근 일주일간 '인기 한식 레시피' 관련 뉴스 RSS 입니다. 여기서 가장 많이 언급되거나 인기 있어 보이는 한식 요리 1가지를 선정하세요. 가정에서 만들 수 있는 요리여야 합니다.\n\n응답 형식: {\"title\": \"요리 이름\", \"description\": \"재료를 포함한 한 줄 설명 (예: 김치와 햄을 이용해서 간단하게 만들 수 있는 인기 음식)\"}\n\nRSS:\n{{ String($json.data).slice(0, 6000) }}"
+            }
+          ]
+        },
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "position": [
+        864,
+        304
+      ],
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8
+    },
+    {
+      "id": "n4",
+      "name": "선정 결과 정리",
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nlet c = raw.message?.content ?? raw.content ?? raw;\nif (typeof c === 'string') { try { c = JSON.parse(c); } catch (e) { c = {}; } }\nreturn [{ json: { title: c.title || '김치볶음밥', description: c.description || '' } }];"
+      },
+      "position": [
+        1152,
+        304
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "credentials": {
+        "openAiApi": {
+          "id": "05vtmsQFSnrSJDbA",
+          "name": "OpenAI account"
+        }
+      },
+      "id": "n5",
+      "name": "OpenAI 레시피 블로그 작성",
+      "parameters": {
+        "jsonOutput": true,
+        "messages": {
+          "values": [
+            {
+              "content": "당신은 한식 요리 전문가입니다. 사용자에게 친절하게 '~하세요' 어조로 간결하게 설명합니다. 반드시 JSON으로만 답하세요.",
+              "role": "system"
+            },
+            {
+              "content": "=요리: {{ $json.title }}\n설명: {{ $json.description }}\n\n위 요리를 만드는 방법을 요약하고 블로그 글을 작성하세요. 모든 문장은 '~하세요' 어조를 사용하고 간결하게 쓰세요.\n\n응답 형식:\n{\"title\": \"요리 이름\", \"description\": \"음식 설명 한 줄\", \"intro\": \"블로그 도입부 2~3문장\", \"ingredients\": [\"재료 1 (분량)\", \"재료 2 (분량)\"], \"steps\": [\"1단계 설명\", \"2단계 설명\"], \"tip\": \"요리 팁 1~2문장\", \"outro\": \"마무리 인사 1문장\"}"
+            }
+          ]
+        },
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "position": [
+        1456,
+        304
+      ],
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8
+    },
+    {
+      "id": "n6",
+      "name": "음식 이미지 검색",
+      "parameters": {
+        "options": {},
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "action",
+              "value": "query"
+            },
+            {
+              "name": "generator",
+              "value": "search"
+            },
+            {
+              "name": "gsrsearch",
+              "value": "={{ $('선정 결과 정리').first().json.title }}"
+            },
+            {
+              "name": "gsrlimit",
+              "value": "3"
+            },
+            {
+              "name": "prop",
+              "value": "pageimages"
+            },
+            {
+              "name": "piprop",
+              "value": "thumbnail"
+            },
+            {
+              "name": "pithumbsize",
+              "value": "1000"
+            },
+            {
+              "name": "format",
+              "value": "json"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "url": "https://ko.wikipedia.org/w/api.php"
+      },
+      "position": [
+        1760,
+        304
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "id": "n7",
+      "name": "블로그 양식 정리",
+      "parameters": {
+        "jsCode": "const blogRaw = $('OpenAI 레시피 블로그 작성').first().json;\nlet b = blogRaw.message?.content ?? blogRaw.content ?? blogRaw;\nif (typeof b === 'string') { try { b = JSON.parse(b); } catch (e) { b = {}; } }\nconst sel = $('선정 결과 정리').first().json;\nconst title = b.title || sel.title;\nconst description = b.description || sel.description;\n\nconst pages = Object.values($input.first().json.query?.pages || {});\nconst withImg = pages.filter(p => p.thumbnail?.source).sort((a, b) => (a.index || 0) - (b.index || 0));\nconst imageUrl = withImg[0]?.thumbnail?.source || '';\n\nconst esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst ing = (b.ingredients || []).map(i => `<li>${esc(i)}</li>`).join('');\nconst steps = (b.steps || []).map(s => `<li style=\"margin-bottom:6px\">${esc(s)}</li>`).join('');\n\nconst html = `<div style=\"max-width:640px;margin:0 auto;font-family:'Malgun Gothic',Arial,sans-serif;color:#222;line-height:1.7\">\n<h1 style=\"border-bottom:3px solid #d9480f;padding-bottom:8px\">${esc(title)}</h1>\n<p style=\"background:#fff4e6;padding:12px;border-radius:6px\"><b>음식 설명</b> : ${esc(description)}</p>\n${imageUrl ? `<p><img src=\"${imageUrl}\" alt=\"${esc(title)}\" style=\"width:100%;border-radius:8px\"></p>` : ''}\n<p>${esc(b.intro)}</p>\n<h2>🥘 재료</h2><ul>${ing}</ul>\n<h2>👩‍🍳 요리 순서</h2><ol>${steps}</ol>\n<h2>💡 요리 팁</h2><p>${esc(b.tip)}</p>\n<hr><p style=\"color:#666\">${esc(b.outro)}</p>\n</div>`;\n\nreturn [{ json: { title, description, imageUrl, html, subject: `[오늘의 한식] ${title} 만드는 방법` } }];"
+      },
+      "position": [
+        2064,
+        304
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "id": "n8",
+      "name": "이미지 다운로드",
+      "onError": "continueRegularOutput",
+      "parameters": {
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        },
+        "url": "={{ $json.imageUrl }}"
+      },
+      "position": [
+        2352,
+        304
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "credentials": {
+        "smtp": {
+          "id": "tnn3uSl8uwOVPZuh",
+          "name": "SMTP account"
+        }
+      },
+      "id": "n9",
+      "name": "SMTP 메일 발송",
+      "parameters": {
+        "fromEmail": "ynhk6916@gmail.com",
+        "html": "={{ $('블로그 양식 정리').first().json.html }}",
+        "options": {
+          "appendAttribution": false,
+          "attachments": "data"
+        },
+        "subject": "={{ $('블로그 양식 정리').first().json.subject }}",
+        "toEmail": "ynhk6916@gmail.com"
+      },
+      "position": [
+        2656,
+        304
+      ],
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "webhookId": "5c0a3f84-a0c4-42d4-8d94-e1f3a367da1d"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "binaryMode": "separate",
+    "executionOrder": "v1",
+    "timezone": "Asia/Seoul"
+  },
+  "tags": [],
+  "updatedAt": "2026-11-06T12:20:01.131Z",
+  "versionId": "23323b16-597f-4376-b863-c5130595450c"
+}

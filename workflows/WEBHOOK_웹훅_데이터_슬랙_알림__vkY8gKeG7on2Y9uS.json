@@ -1,0 +1,72 @@
+{
+  "active": false,
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Slack",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "id": "vkY8gKeG7on2Y9uS",
+  "isArchived": false,
+  "name": "[WEBHOOK] 웹훅 데이터 슬랙 알림",
+  "nodes": [
+    {
+      "id": "webhook-1",
+      "name": "Webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "options": {},
+        "path": "slack-alert"
+      },
+      "position": [
+        256,
+        304
+      ],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "webhookId": "slack-alert"
+    },
+    {
+      "credentials": {
+        "slackApi": {
+          "id": "J1qnmd8KUe1oeVVZ",
+          "name": "Slack account"
+        }
+      },
+      "id": "slack-1",
+      "name": "Slack",
+      "parameters": {
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#alert"
+        },
+        "otherOptions": {},
+        "select": "channel",
+        "text": "=웹훅 데이터 수신:\n```{{ JSON.stringify($json.body, null, 2) }}```"
+      },
+      "position": [
+        560,
+        304
+      ],
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "webhookId": "da11dcfb-ca0c-46f3-bccd-8612d1b9129d"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "binaryMode": "separate",
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "updatedAt": "2026-11-04T12:49:33.632Z",
+  "versionId": "fc1a9a30-2939-4f8a-9bfe-b6ee573e692d"
+}

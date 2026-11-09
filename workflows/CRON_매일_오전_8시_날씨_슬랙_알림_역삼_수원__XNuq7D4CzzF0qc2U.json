@@ -1,0 +1,154 @@
+{
+  "active": false,
+  "connections": {
+    "Open-Meteo 날씨 조회": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "슬랙 메시지 만들기",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "매일 오전 8시": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Open-Meteo 날씨 조회",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "슬랙 메시지 만들기": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Slack #alert 발송",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "id": "XNuq7D4CzzF0qc2U",
+  "isArchived": false,
+  "name": "[CRON] 매일 오전 8시 날씨 슬랙 알림 (역삼·수원)",
+  "nodes": [
+    {
+      "id": "w1",
+      "name": "매일 오전 8시",
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "position": [
+        256,
+        304
+      ],
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2
+    },
+    {
+      "id": "w2",
+      "name": "Open-Meteo 날씨 조회",
+      "parameters": {
+        "options": {},
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "latitude",
+              "value": "37.5006,37.2636"
+            },
+            {
+              "name": "longitude",
+              "value": "127.0364,127.0286"
+            },
+            {
+              "name": "current",
+              "value": "temperature_2m,relative_humidity_2m,weather_code"
+            },
+            {
+              "name": "daily",
+              "value": "precipitation_probability_max"
+            },
+            {
+              "name": "timezone",
+              "value": "Asia/Seoul"
+            },
+            {
+              "name": "forecast_days",
+              "value": "1"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "url": "https://api.open-meteo.com/v1/forecast"
+      },
+      "position": [
+        560,
+        304
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "id": "w3",
+      "name": "슬랙 메시지 만들기",
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst list = Array.isArray(raw) ? raw : ($input.all().map(i => i.json));\nconst names = ['서울시 역삼동', '경기도 수원시'];\nconst wmo = (c) => {\n  if (c === 0) return '맑음';\n  if (c === 1) return '대체로 맑음';\n  if (c === 2) return '구름 조금';\n  if (c === 3) return '흐림';\n  if (c === 45 || c === 48) return '안개';\n  if (c >= 51 && c <= 57) return '이슬비';\n  if (c >= 61 && c <= 67) return '비';\n  if (c >= 71 && c <= 77) return '눈';\n  if (c >= 80 && c <= 82) return '소나기';\n  if (c === 85 || c === 86) return '눈 소나기';\n  if (c >= 95) return '뇌우';\n  return '알 수 없음';\n};\nconst blocks = list.map((d, i) => {\n  const cur = d.current;\n  const prob = d.daily?.precipitation_probability_max?.[0];\n  return `[${names[i]} 날씨]\\n- 날씨: ${wmo(cur.weather_code)}\\n- 온도: ${cur.temperature_2m}°C\\n- 습도: ${cur.relative_humidity_2m}%\\n- 강수확률: ${prob ?? '-'}%`;\n});\nreturn [{ json: { text: blocks.join('\\n\\n') } }];\n"
+      },
+      "position": [
+        864,
+        304
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "credentials": {
+        "slackApi": {
+          "id": "J1qnmd8KUe1oeVVZ",
+          "name": "Slack account"
+        }
+      },
+      "id": "w4",
+      "name": "Slack #alert 발송",
+      "parameters": {
+        "channelId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "#alert"
+        },
+        "otherOptions": {},
+        "select": "channel",
+        "text": "={{ $json.text }}"
+      },
+      "position": [
+        1152,
+        304
+      ],
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "webhookId": "ec41c6f0-d5a9-4f91-a86f-ca932ef39159"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "binaryMode": "separate",
+    "executionOrder": "v1",
+    "timezone": "Asia/Seoul"
+  },
+  "tags": [],
+  "updatedAt": "2026-11-06T12:46:32.702Z",
+  "versionId": "5f691894-accf-427f-97ed-4758f9758b21"
+}

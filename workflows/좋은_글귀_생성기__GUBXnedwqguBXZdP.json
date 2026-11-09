@@ -1,0 +1,58 @@
+{
+  "active": false,
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Generate Quote",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "id": "GUBXnedwqguBXZdP",
+  "isArchived": false,
+  "name": "좋은 글귀 생성기",
+  "nodes": [
+    {
+      "id": "webhook-1",
+      "name": "Webhook",
+      "parameters": {
+        "httpMethod": "GET",
+        "options": {},
+        "path": "quote",
+        "responseMode": "lastNode"
+      },
+      "position": [
+        0,
+        0
+      ],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "webhookId": "quote-webhook-0001"
+    },
+    {
+      "id": "code-1",
+      "name": "Generate Quote",
+      "parameters": {
+        "jsCode": "const quotes = [\n  '천 리 길도 한 걸음부터.',\n  '오늘 걷지 않으면 내일은 뛰어야 한다.',\n  '실패는 포기할 때 비로소 시작된다.',\n  '작은 습관이 큰 변화를 만든다.',\n  '가장 어두운 밤도 끝나고 해는 떠오른다.',\n  '시작이 반이다.',\n  '꾸준함은 재능을 이긴다.',\n  '당신이 할 수 있다고 믿는 순간, 이미 절반은 온 것이다.',\n  '느려도 괜찮다, 멈추지만 않으면.',\n  '오늘의 노력은 내일의 나를 만든다.'\n];\nconst quote = quotes[Math.floor(Math.random() * quotes.length)];\nconsole.log('[글귀] ' + quote);\nreturn [{ json: { quote } }];"
+      },
+      "position": [
+        240,
+        0
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    }
+  ],
+  "pinData": null,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "updatedAt": "2026-11-04T11:37:47.630Z",
+  "versionId": "5f1b2398-b41c-47d3-9f63-c3a8ca11e0d5"
+}
