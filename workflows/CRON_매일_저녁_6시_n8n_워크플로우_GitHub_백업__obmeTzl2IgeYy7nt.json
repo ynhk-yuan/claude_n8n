@@ -1,5 +1,5 @@
 {
-  "active": false,
+  "active": true,
   "connections": {
     "기존 백업 목록": {
       "main": [
@@ -102,6 +102,17 @@
           {
             "index": 0,
             "node": "커밋 파일 구성",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "임시 테스트 웹훅": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "백업 설정",
             "type": "main"
           }
         ]
@@ -655,6 +666,22 @@
       ],
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2
+    },
+    {
+      "id": "g99",
+      "name": "임시 테스트 웹훅",
+      "parameters": {
+        "httpMethod": "POST",
+        "options": {},
+        "path": "backup-test-tmp"
+      },
+      "position": [
+        256,
+        560
+      ],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "webhookId": "4f859912-cebc-40f3-aec7-8993b52874c0"
     }
   ],
   "pinData": {},
@@ -664,6 +691,6 @@
     "timezone": "Asia/Seoul"
   },
   "tags": [],
-  "updatedAt": "2026-11-09T12:28:10.383Z",
-  "versionId": "ab050b22-79d3-41f0-84ae-aa2376e42e5f"
+  "updatedAt": "2026-11-09T12:31:00.992Z",
+  "versionId": "3410b9a8-d4b8-4deb-8719-b079d242d008"
 }
